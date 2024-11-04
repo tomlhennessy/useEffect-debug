@@ -8,28 +8,34 @@ const RandomUserTwo = () => {
   const [num, setNum] = useState(0);
   const [searchChange, setSearchChange] = useState('');
   const [searchWord, setSearchWord] = useState(
-    localStorage.setItem('user') || 'foobar'
+    localStorage.getItem('user') || 'foobar'
   );
-  
+
   const [data, setData] = useState([]);
 
+  // fetch user data from API whenever searchWord changes
   useEffect(() => {
-    const fetchUser = () => {
+    const fetchUser = async () => {
       const res = await fetch(`https://randomuser.me/api/?seed=${searchWord}`);
       const data = await res.json();
       setData(data.results);
     };
-  }, []);
+    fetchUser(); // call the function immediately
+  }, [searchWord]); // add searchWord as a dependancy
 
+  // save searchWord to localStorage whenever it changes
   useEffect(() => {
-    localStorage.getItem('user', searchWord);
+    localStorage.setItem('user', searchWord);
   }, [searchWord]);
 
+  // change background color on interval
   useEffect(() => {
     const colorInterval = setInterval(() => {
       console.log('i am running');
       setNum((prevNum) => (prevNum === 3 ? 0 : prevNum + 1));
     }, 7000);
+
+    return () => clearInterval(colorInterval); // cleanup function
   }, []);
 
   return (
